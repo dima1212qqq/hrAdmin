@@ -5,13 +5,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.dovakun.data.User;
-import ru.dovakun.data.UserRepository;
+import ru.dovakun.data.entity.User;
+import ru.dovakun.repo.UserRepository;
 
 @Service
 public class UserService {
 
     private final UserRepository repository;
+
+    public Optional<User> findByUsername(String username) {
+        return repository.findByUsername(username);
+    }
 
     public UserService(UserRepository repository) {
         this.repository = repository;

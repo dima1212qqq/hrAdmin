@@ -2,7 +2,6 @@ package ru.dovakun.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
@@ -17,16 +16,15 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import java.io.ByteArrayInputStream;
+
 import java.util.List;
 import java.util.Optional;
-import ru.dovakun.data.User;
+import ru.dovakun.data.entity.User;
 import ru.dovakun.security.AuthenticatedUser;
 
 /**
@@ -45,9 +43,15 @@ public class MainLayout extends AppLayout {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
 
-        setPrimarySection(Section.DRAWER);
-        addDrawerContent();
-        addHeaderContent();
+        if (authenticatedUser.get().isPresent()) {
+            this.setVisible(true);
+            setPrimarySection(Section.DRAWER);
+            addHeaderContent();
+            addDrawerContent();
+        }
+        else {
+            this.setVisible(false);
+        }
     }
 
     private void addHeaderContent() {
@@ -92,20 +96,12 @@ public class MainLayout extends AppLayout {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
 
-            Avatar avatar = new Avatar(user.getName());
-            StreamResource resource = new StreamResource("profile-pic",
-                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-            avatar.setImageResource(resource);
-            avatar.setThemeName("xsmall");
-            avatar.getElement().setAttribute("tabindex", "-1");
 
             MenuBar userMenu = new MenuBar();
             userMenu.setThemeName("tertiary-inline contrast");
 
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
-            div.add(avatar);
-            div.add(user.getName());
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");
@@ -127,7 +123,9 @@ public class MainLayout extends AppLayout {
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-        viewTitle.setText(getCurrentPageTitle());
+        if (authenticatedUser.get().isPresent()) {
+            viewTitle.setText(getCurrentPageTitle());
+        }
     }
 
     private String getCurrentPageTitle() {
