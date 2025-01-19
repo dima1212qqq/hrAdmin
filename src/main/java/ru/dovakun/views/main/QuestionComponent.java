@@ -33,7 +33,7 @@ public class QuestionComponent extends VerticalLayout {
         answersLayout.add(answerComponent);
     }
     public void addQuestion(Question question, List<Answer> answers) {
-        questionField.setValue(question.getQuestionText());
+        questionField.setValue(question.getQuestionText()!=null?question.getQuestionText():"");
         question.setAnswers(answers);
         for (Answer answer : answers) {
             answer.setQuestion(question);

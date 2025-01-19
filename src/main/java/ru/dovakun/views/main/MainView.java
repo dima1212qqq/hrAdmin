@@ -65,13 +65,7 @@ public class MainView extends VerticalLayout {
         testGrid.setDetailsVisibleOnClick(false);
         testGrid.setItems(testAssignments);
         testAssignmentForm = new TestAssignmentForm(this, questionService, answerService, testAssignmentService,authenticatedUser);
-        testGrid.addSelectionListener(event -> {
-            if (currentTestAssignment != null) {
-                testAssignmentForm.setVisible(true);
-            }else {
-                testAssignmentForm.setVisible(false);
-            }
-        });
+
         testGrid.addItemClickListener(event -> {
             currentTestAssignment = event.getItem();
             testAssignmentForm.setTestAssignment(currentTestAssignment);
