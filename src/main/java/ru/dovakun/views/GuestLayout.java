@@ -1,4 +1,4 @@
-package ru.dovakun;
+package ru.dovakun.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 

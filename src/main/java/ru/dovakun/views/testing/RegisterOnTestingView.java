@@ -14,7 +14,7 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import ru.dovakun.GuestLayout;
+import ru.dovakun.views.GuestLayout;
 import ru.dovakun.data.entity.Applicant;
 import ru.dovakun.data.entity.Question;
 import ru.dovakun.data.entity.TestAssignment;
