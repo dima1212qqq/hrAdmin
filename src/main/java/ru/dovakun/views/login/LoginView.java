@@ -15,6 +15,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.dovakun.GuestLayout;
 import ru.dovakun.data.entity.Role;
 import ru.dovakun.data.entity.User;
 import ru.dovakun.repo.UserRepository;
@@ -25,7 +26,7 @@ import java.util.Collections;
 
 @AnonymousAllowed
 @PageTitle("Авторизация")
-@Route(value = "login")
+@Route(value = "login", layout = GuestLayout.class)
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private final LoginOverlay login = new LoginOverlay();

@@ -1,6 +1,7 @@
 package ru.dovakun.services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.dovakun.data.entity.Answer;
 import ru.dovakun.repo.AnswerRepo;
 
@@ -20,5 +21,9 @@ public class AnswerService {
 
     public void save(List<Answer> answers) {
         answerRepo.saveAll(answers);
+    }
+    @Transactional
+    public void delete(Answer answer) {
+        answerRepo.delete(answer);
     }
 }

@@ -36,22 +36,12 @@ public class MainLayout extends AppLayout {
 
     private H1 viewTitle;
 
-    private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
-
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    private final AuthenticatedUser authenticatedUser;
+    public MainLayout(AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
-        this.accessChecker = accessChecker;
-
-        if (authenticatedUser.get().isPresent()) {
-            this.setVisible(true);
-            setPrimarySection(Section.DRAWER);
+        setPrimarySection(Section.DRAWER);
             addHeaderContent();
             addDrawerContent();
-        }
-        else {
-            this.setVisible(false);
-        }
     }
 
     private void addHeaderContent() {

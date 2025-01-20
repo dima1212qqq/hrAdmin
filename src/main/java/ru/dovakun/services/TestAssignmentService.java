@@ -1,8 +1,8 @@
 package ru.dovakun.services;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import ru.dovakun.data.entity.TestAssignment;
-import ru.dovakun.data.entity.User;
 import ru.dovakun.repo.TestAssignmentRepo;
 
 import java.util.List;
@@ -21,5 +21,9 @@ public class TestAssignmentService {
     }
     public void save(TestAssignment testAssignment) {
         testAssignmentRepo.save(testAssignment);
+    }
+
+    public TestAssignment getByLink(String s){
+        return testAssignmentRepo.findByUniqueLink(s);
     }
 }

@@ -14,9 +14,9 @@ import java.util.List;
 @Entity
 public class Question extends AbstractEntity {
     private String questionText;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private TestAssignment testAssignment;
-    @OneToMany(mappedBy = "question",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "question",fetch = FetchType.LAZY)
     private List<Answer> answers = new ArrayList<>();
 
 }

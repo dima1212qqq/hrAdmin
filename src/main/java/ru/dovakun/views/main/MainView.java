@@ -34,14 +34,10 @@ import java.util.stream.Stream;
 @RolesAllowed("ADMIN")
 public class MainView extends VerticalLayout {
     private final TestAssignmentService testAssignmentService;
-    private final AuthenticatedUser authenticatedUser;
     private final TestAssignmentRepo testAssignmentRepo;
     private final Grid<TestAssignment> testGrid;
-    private final QuestionService questionService;
-    private final AnswerService answerService;
-    private TestAssignmentForm testAssignmentForm;
+    private final TestAssignmentForm testAssignmentForm;
     public TestAssignment currentTestAssignment;
-    private final Button createTestAssignment;
     private final VerticalLayout layout;
     public MainView(TestAssignmentService testAssignmentService, AuthenticatedUser authenticatedUser, TestAssignmentRepo testAssignmentRepo, QuestionService questionService, AnswerService answerService) {
         setSizeFull();
@@ -49,10 +45,9 @@ public class MainView extends VerticalLayout {
         setJustifyContentMode(JustifyContentMode.START);
         User user = authenticatedUser.get().get();
        layout = new VerticalLayout();
-        createTestAssignment = new Button("Создать тестовое", event -> {
+        Button createTestAssignment = new Button("Создать тестовое", event -> {
             openDialogCreateTestAssignment(user);
         });
-        this.authenticatedUser = authenticatedUser;
         testGrid = new Grid<>(TestAssignment.class, false);
         List<TestAssignment> testAssignments = testAssignmentService.getTestAssignmentsByUser(user.getId());
         testGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -82,8 +77,6 @@ public class MainView extends VerticalLayout {
         testAssignmentForm.setVisible(false);
         this.testAssignmentService = testAssignmentService;
         this.testAssignmentRepo = testAssignmentRepo;
-        this.questionService = questionService;
-        this.answerService = answerService;
     }
 
     public void showForm(boolean isShow) {

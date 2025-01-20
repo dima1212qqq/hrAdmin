@@ -1,6 +1,8 @@
 package ru.dovakun.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import ru.dovakun.data.AbstractEntity;
@@ -12,7 +14,8 @@ public class Answer extends AbstractEntity {
     private double score;
     private boolean requires;
     private String detailsHint;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Question question;
     @ManyToOne
     private Applicant applicant;

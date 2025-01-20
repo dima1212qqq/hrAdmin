@@ -1,14 +1,13 @@
 package ru.dovakun.data.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.Data;
 import ru.dovakun.data.AbstractEntity;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.OffsetDateTime;
+
 
 @Data
 @Entity
@@ -16,14 +15,11 @@ public class Applicant extends AbstractEntity {
     private String name;
     private String resumeLink;
     private String contactMethod;
-    private String uniqueHash;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private double score;
-    private double completionPercentage;
-    private String status; // New, Consider, Rejected, Accepted
-    @ManyToOne
+    private String ipAddress;
+    private String hashCode;
+    @ManyToOne(fetch = FetchType.LAZY)
     private TestAssignment testAssignment;
-    @OneToMany(mappedBy = "applicant")
-    private List<Answer> answers = new ArrayList<>();
+    private OffsetDateTime startTime;
+    private OffsetDateTime endTime;
+
 }
