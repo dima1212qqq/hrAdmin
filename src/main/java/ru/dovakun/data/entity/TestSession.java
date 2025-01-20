@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "test_session", uniqueConstraints = {@UniqueConstraint(columnNames = {"test_assignment_id","hash_code"})})
 public class TestSession extends AbstractEntity {
 
     private String hashCode;

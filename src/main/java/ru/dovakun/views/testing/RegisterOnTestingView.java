@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEvent;
@@ -14,6 +15,7 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.springframework.dao.DataIntegrityViolationException;
 import ru.dovakun.views.GuestLayout;
 import ru.dovakun.data.entity.Applicant;
 import ru.dovakun.data.entity.Question;
@@ -91,7 +93,6 @@ public class RegisterOnTestingView extends VerticalLayout
                 applicant.setIpAddress(ipAddress);
                 applicant.setHashCode(hashCodeGenerator.generateUserHash(applicant.toString()));
                 applicant.setStartTime(OffsetDateTime.now());
-                Notification.show(hashCodeGenerator.generateUserHash(applicant.toString()));
                 applicantService.save(applicant);
                 TestSession testSession = new TestSession();
                 testSession.setCurrentQuestionIndex(0);
@@ -99,8 +100,16 @@ public class RegisterOnTestingView extends VerticalLayout
                 testSession.setHashCode(applicant.getHashCode());
                 testSession.setTestAssignment(assignment);
                 testSession.setApplicant(applicant);
-                testSessionService.save(testSession);
-                UI.getCurrent().navigate("test/"+testSession.getHashCode());
+                try {
+                    testSessionService.save(testSession);
+                    UI.getCurrent().navigate("test/"+testSession.getHashCode());
+                }catch (DataIntegrityViolationException dive) {
+                    Notification notification = new Notification("Пользователь уже зарегестрирован на этом тестирование!");
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    notification.setPosition(Notification.Position.BOTTOM_CENTER);
+                    notification.open();
+                    notification.setDuration(3000);
+                }
             });
         }
     }
