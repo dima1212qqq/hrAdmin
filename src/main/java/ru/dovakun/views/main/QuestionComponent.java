@@ -1,5 +1,7 @@
 package ru.dovakun.views.main;
 
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -17,27 +19,38 @@ public class QuestionComponent extends VerticalLayout {
     private final VerticalLayout answersLayout = new VerticalLayout();
     private final HorizontalLayout buttonLayout;
 
-    public QuestionComponent(Question question, List<Answer> answers, QuestionService questionService, AnswerService answerService,List<Question> questions) {
-        questionField.setWidthFull();
-
+    public QuestionComponent(Question question, List<Answer> answers, QuestionService questionService, AnswerService answerService, List<Question> questions, Accordion accordion) {
+        AccordionPanel accordionPanel = accordion.add(question.getQuestionText(),this);
+        accordionPanel.setWidthFull();
         Button addAnswer = new Button("Добавить ответ");
-        addAnswer.addClickListener(event -> addNewAnswer(answers, question, answerService));
         Button deleteQuestion = new Button("Удалить вопрос");
-        deleteQuestion.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        deleteQuestion.addClickListener(event -> {
-            questionService.delete(question);
-            answers.removeAll(question.getAnswers());
-            questions.remove(question);
-            if (this.getParent().isPresent() && this.getParent().get() instanceof VerticalLayout parentLayout) {
-                parentLayout.remove(this);
-            }
+        questionField.addValueChangeListener(event -> {
+           accordionPanel.setSummaryText(question.getQuestionText());
         });
         buttonLayout = new HorizontalLayout();
-        buttonLayout.add(addAnswer, deleteQuestion);
-        add(questionField, buttonLayout, answersLayout);
-        questionField.addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
-            question.setQuestionText(textFieldStringComponentValueChangeEvent.getValue());
+        accordionPanel.addOpenedChangeListener(e -> {
+          if(e.isOpened()){
+
+              addAnswer.addClickListener(event -> addNewAnswer(answers, question, answerService));
+              deleteQuestion.addThemeVariants(ButtonVariant.LUMO_ERROR);
+              deleteQuestion.addClickListener(event -> {
+                  questionService.delete(question);
+                  answers.removeAll(question.getAnswers());
+                  questions.remove(question);
+                  if (this.getParent().isPresent() && this.getParent().get() instanceof VerticalLayout parentLayout) {
+                      parentLayout.remove(this);
+                  }
+                  accordionPanel.removeFromParent();
+              });
+              buttonLayout.add(addAnswer, deleteQuestion);
+              accordionPanel.add(questionField, buttonLayout, answersLayout);
+//        add(questionField, buttonLayout, answersLayout);
+              questionField.addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
+                  question.setQuestionText(textFieldStringComponentValueChangeEvent.getValue());
+              });
+          }
         });
+        accordionPanel.setOpened(true);
     }
 
 

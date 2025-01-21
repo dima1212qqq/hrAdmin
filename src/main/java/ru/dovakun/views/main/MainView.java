@@ -1,5 +1,6 @@
 package ru.dovakun.views.main;
 
+import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -39,12 +40,13 @@ public class MainView extends VerticalLayout {
     private final TestAssignmentForm testAssignmentForm;
     public TestAssignment currentTestAssignment;
     private final VerticalLayout layout;
+
     public MainView(TestAssignmentService testAssignmentService, AuthenticatedUser authenticatedUser, TestAssignmentRepo testAssignmentRepo, QuestionService questionService, AnswerService answerService) {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.START);
         User user = authenticatedUser.get().get();
-       layout = new VerticalLayout();
+        layout = new VerticalLayout();
         Button createTestAssignment = new Button("Создать тестовое", event -> {
             openDialogCreateTestAssignment(user);
         });
@@ -59,7 +61,7 @@ public class MainView extends VerticalLayout {
         testGrid.addColumn(TestAssignment::getVacancyLink).setHeader("Ссылка на вакансию");
         testGrid.setDetailsVisibleOnClick(false);
         testGrid.setItems(testAssignments);
-        testAssignmentForm = new TestAssignmentForm(this, questionService, answerService, testAssignmentService,authenticatedUser);
+        testAssignmentForm = new TestAssignmentForm(this, questionService, answerService, testAssignmentService, authenticatedUser);
 
         testGrid.addItemClickListener(event -> {
             currentTestAssignment = event.getItem();
@@ -71,7 +73,7 @@ public class MainView extends VerticalLayout {
         layout.setFlexGrow(0, createTestAssignment);
         layout.expand(testGrid);
         layout.setSizeFull();
-        layout.add(createTestAssignment,testGrid);
+        layout.add(createTestAssignment, testGrid);
         add(layout);
         add(testAssignmentForm);
         testAssignmentForm.setVisible(false);
@@ -108,7 +110,7 @@ public class MainView extends VerticalLayout {
             refreshGrid(user);
             dialog.close();
         });
-        layout.add(nameField, linkField, descriptionField,save);
+        layout.add(nameField, linkField, descriptionField, save);
         dialog.add(layout);
     }
 
@@ -116,26 +118,28 @@ public class MainView extends VerticalLayout {
             Grid<TestAssignment> grid) {
 
         return LitRenderer
-                .<TestAssignment> of("""
-                    <vaadin-button
-                        theme="tertiary icon"
-                        aria-label="Toggle details"
-                        aria-expanded="${model.detailsOpened ? 'true' : 'false'}"
-                        @click="${handleClick}"
-                    >
-                        <vaadin-icon
-                        .icon="${model.detailsOpened ? 'lumo:angle-down' : 'lumo:angle-right'}"
-                        ></vaadin-icon>
-                    </vaadin-button>
-                """)
+                .<TestAssignment>of("""
+                            <vaadin-button
+                                theme="tertiary icon"
+                                aria-label="Toggle details"
+                                aria-expanded="${model.detailsOpened ? 'true' : 'false'}"
+                                @click="${handleClick}"
+                            >
+                                <vaadin-icon
+                                .icon="${model.detailsOpened ? 'lumo:angle-down' : 'lumo:angle-right'}"
+                                ></vaadin-icon>
+                            </vaadin-button>
+                        """)
                 .withFunction("handleClick",
                         testAssignment -> grid.setDetailsVisible(testAssignment,
                                 !grid.isDetailsVisible(testAssignment)));
     }
+
     private static ComponentRenderer<TestAssignmentFormLayout, TestAssignment> createPersonDetailsRenderer() {
         return new ComponentRenderer<>(TestAssignmentFormLayout::new,
                 TestAssignmentFormLayout::setTestAssignment);
     }
+
     private static class TestAssignmentFormLayout extends FormLayout {
         private final TextArea descriptionField = new TextArea("Описание");
 
@@ -153,6 +157,7 @@ public class MainView extends VerticalLayout {
 
         }
     }
+
     public void refreshGrid(User user) {
         List<TestAssignment> testAssignments = testAssignmentService.getTestAssignmentsByUser(user.getId());
         testGrid.setItems(testAssignments);
