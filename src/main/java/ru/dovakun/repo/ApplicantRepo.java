@@ -11,4 +11,6 @@ public interface ApplicantRepo extends JpaRepository<Applicant, Long> {
 
     @Query("select a from Applicant a where a.testAssignment.id in (:ids)")
     List<Applicant> findAllByTestAssignment_Id(List<Long> ids);
+    @Query("select a from Applicant a where a.testAssignment.id =:id")
+    List<Applicant> findAllByTestAssignment(Long id);
 }

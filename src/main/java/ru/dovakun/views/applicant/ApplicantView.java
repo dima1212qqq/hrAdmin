@@ -2,18 +2,22 @@ package ru.dovakun.views.applicant;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 import ru.dovakun.data.entity.Applicant;
 import ru.dovakun.data.entity.TestAssignment;
-import ru.dovakun.data.entity.TestResult;
 import ru.dovakun.data.entity.TestSession;
 import ru.dovakun.data.enums.Status;
+import ru.dovakun.repo.TestAssignmentRepo;
 import ru.dovakun.security.AuthenticatedUser;
 import ru.dovakun.services.ApplicantService;
 import ru.dovakun.services.TestAssignmentService;
@@ -25,84 +29,28 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Route("/applicant")
 @RolesAllowed("ADMIN")
-@Menu(order = 1, icon = LineAwesomeIconUrl.PEOPLE_CARRY_SOLID)
-public class ApplicantView extends VerticalLayout {
+public class ApplicantView extends VerticalLayout implements HasUrlParameter<String> {
 
     private final TestResultService testResultService;
     private final AuthenticatedUser authenticatedUser;
     private final ApplicantService applicantService;
     private final TestAssignmentService testAssignmentService;
     private final TestSessionService testSessionService;
+    private Optional<TestAssignment> testAssignment;
+    private final TestAssignmentRepo testAssignmentRepo;
 
-    public ApplicantView(TestResultService testResultService, AuthenticatedUser authenticatedUser, ApplicantService applicantService, TestAssignmentService testAssignmentService, TestSessionService testSessionService) {
-        Grid<Applicant> grid = new Grid<>(Applicant.class, false);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    public ApplicantView(TestResultService testResultService, AuthenticatedUser authenticatedUser, ApplicantService applicantService, TestAssignmentService testAssignmentService, TestSessionService testSessionService, TestAssignmentRepo testAssignmentRepo) {
+        this.testAssignmentRepo = testAssignmentRepo;
         this.testResultService = testResultService;
         this.applicantService = applicantService;
         this.testAssignmentService = testAssignmentService;
-        List<TestAssignment> testAssignments = testAssignmentService.getTestAssignmentsByUser(authenticatedUser.get().get().getId());
-        List<Applicant> applicants = applicantService.findAllByTest(testAssignments);
-//        List<TestResult> testResults = testResultService.findAllByApplicants(applicants);
         this.testSessionService = testSessionService;
-        List<TestSession> testSessions = testSessionService.findAllByApplicants(applicants);
-        Map<Long, TestSession> sessionMap = testSessions.stream()
-                .collect(Collectors.toMap(ts -> ts.getApplicant().getId(), ts -> ts));
-
-        grid.addColumn(createApplicantRenderer())
-                .setHeader("Имя и Ссылка")
-                .setAutoWidth(true)
-                .setFlexGrow(1);
-        grid.addColumn(createProgressAndScoreRenderer(sessionMap,testResultService))
-                .setHeader("Прогресс и Баллы")
-                .setAutoWidth(true)
-                .setFlexGrow(1);
-
-        grid.addColumn(createTimeRenderer(formatter))
-                .setHeader("Время")
-                .setAutoWidth(true)
-                .setFlexGrow(1);
-
-        grid.addColumn(applicant -> {
-            TestSession session = sessionMap.get(applicant.getId());
-
-            if (session != null && session.isCompleted()) {
-                OffsetDateTime startTime = applicant.getStartTime();
-                OffsetDateTime endTime = applicant.getEndTime();
-
-                if (startTime != null && endTime != null) {
-                    Duration duration = Duration.between(startTime, endTime);
-                    long minutes = duration.toMinutes();
-                    return minutes + " минут" + (minutes == 1 ? "а" : "");
-                } else {
-                    return "Данные отсутствуют";
-                }
-            } else {
-                return "Ещё не закончил";
-            }
-        }).setHeader("Затраченное время");
-        grid.addComponentColumn(applicant -> {
-            ComboBox<Status> statusComboBox = new ComboBox<>();
-            statusComboBox.setItems(Status.values());
-            statusComboBox.setItemLabelGenerator(Status::getTranslationKey);
-            statusComboBox.setValue(applicant.getStatus());
-            statusComboBox.addValueChangeListener(event -> {
-                if (event.getValue() != null) {
-                    applicant.setStatus(event.getValue());
-                    applicantService.save(applicant);
-                    applicant.setStatus(event.getValue());
-                    applicantService.save(applicant);
-                    grid.getDataProvider().refreshItem(applicant);
-                }
-            });
-            return statusComboBox;
-        }).setHeader("Статус");
-        grid.setItems(applicants);
         this.authenticatedUser = authenticatedUser;
-        add(grid);
     }
 
     private static Renderer<Applicant> createApplicantRenderer() {
@@ -167,4 +115,74 @@ public class ApplicantView extends VerticalLayout {
                 });
     }
 
+    @Override
+    public void setParameter(BeforeEvent beforeEvent, String s) {
+        testAssignment = testAssignmentRepo.findById(Long.valueOf(s));
+        if (testAssignment.isPresent() && testAssignment.get().getUser().getId().equals(authenticatedUser.get().get().getId())) {
+            Grid<Applicant> grid = new Grid<>(Applicant.class, false);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+            List<TestAssignment> testAssignments = testAssignmentService.getTestAssignmentsByUser(authenticatedUser.get().get().getId());
+//        List<Applicant> applicants = applicantService.findAllByTest(testAssignments);
+            List<Applicant> applicants = applicantService.findAllByTest(testAssignment.get());
+//        List<TestResult> testResults = testResultService.findAllByApplicants(applicants);
+            List<TestSession> testSessions = testSessionService.findAllByApplicants(applicants);
+            Map<Long, TestSession> sessionMap = testSessions.stream()
+                    .collect(Collectors.toMap(ts -> ts.getApplicant().getId(), ts -> ts));
+
+            grid.addColumn(createApplicantRenderer())
+                    .setHeader("Имя и Ссылка")
+                    .setAutoWidth(true)
+                    .setFlexGrow(1);
+            grid.addColumn(createProgressAndScoreRenderer(sessionMap,testResultService))
+                    .setHeader("Прогресс и Баллы")
+                    .setAutoWidth(true)
+                    .setFlexGrow(1);
+
+            grid.addColumn(createTimeRenderer(formatter))
+                    .setHeader("Время")
+                    .setAutoWidth(true)
+                    .setFlexGrow(1);
+
+            grid.addColumn(applicant -> {
+                TestSession session = sessionMap.get(applicant.getId());
+
+                if (session != null && session.isCompleted()) {
+                    OffsetDateTime startTime = applicant.getStartTime();
+                    OffsetDateTime endTime = applicant.getEndTime();
+
+                    if (startTime != null && endTime != null) {
+                        Duration duration = Duration.between(startTime, endTime);
+                        long minutes = duration.toMinutes();
+                        return minutes + " минут" + (minutes == 1 ? "а" : "");
+                    } else {
+                        return "Данные отсутствуют";
+                    }
+                } else {
+                    return "Ещё не закончил";
+                }
+            }).setHeader("Затраченное время");
+            grid.addComponentColumn(applicant -> {
+                ComboBox<Status> statusComboBox = new ComboBox<>();
+                statusComboBox.setItems(Status.values());
+                statusComboBox.setItemLabelGenerator(Status::getTranslationKey);
+                statusComboBox.setValue(applicant.getStatus());
+                statusComboBox.addValueChangeListener(event -> {
+                    if (event.getValue() != null) {
+                        applicant.setStatus(event.getValue());
+                        applicantService.save(applicant);
+                        applicant.setStatus(event.getValue());
+                        applicantService.save(applicant);
+                        grid.getDataProvider().refreshItem(applicant);
+                    }
+                });
+                return statusComboBox;
+            }).setHeader("Статус");
+            grid.setItems(applicants);
+            add(grid);
+        }else {
+            add(new Div(new H1("Данных о результате тестирования не доступны!")));
+        }
+
+    }
 }

@@ -6,7 +6,6 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
 import ru.dovakun.data.entity.Answer;
 import ru.dovakun.data.entity.Question;
 import ru.dovakun.services.AnswerService;

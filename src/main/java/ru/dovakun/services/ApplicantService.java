@@ -30,4 +30,7 @@ public class ApplicantService {
         List<Long> ids = testAssignments.stream().map(TestAssignment::getId).toList();
         return applicantRepo.findAllByTestAssignment_Id(ids);
     }
+    public List<Applicant> findAllByTest(TestAssignment testAssignments) {
+        return applicantRepo.findAllByTestAssignment(testAssignments.getId());
+    }
 }
