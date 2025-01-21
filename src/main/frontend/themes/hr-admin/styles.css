@@ -1,1 +1,13 @@
 @import url('./main-layout.css');
+.status-new {
+    background-color: #e3f2fd;
+}
+.status-think {
+    background-color: #eadb31;
+}
+.status-rejected {
+    background-color: #e40724;
+}
+.status-adopted {
+    background-color: #238c17;
+}

@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import lombok.Data;
 import ru.dovakun.data.AbstractEntity;
+import ru.dovakun.data.enums.Role;
 
 import java.util.Set;
 

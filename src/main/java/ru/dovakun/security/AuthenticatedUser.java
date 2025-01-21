@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dovakun.data.entity.Role;
+import ru.dovakun.data.enums.Role;
 import ru.dovakun.data.entity.User;
 import ru.dovakun.repo.UserRepository;
 

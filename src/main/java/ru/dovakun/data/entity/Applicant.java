@@ -1,10 +1,9 @@
 package ru.dovakun.data.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 import ru.dovakun.data.AbstractEntity;
+import ru.dovakun.data.enums.Status;
 
 import java.time.OffsetDateTime;
 
@@ -21,5 +20,7 @@ public class Applicant extends AbstractEntity {
     private TestAssignment testAssignment;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.NEW;
 
 }

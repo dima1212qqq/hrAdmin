@@ -1,4 +1,4 @@
-package ru.dovakun.data.entity;
+package ru.dovakun.data.enums;
 
 public enum Role {
     USER, ADMIN;

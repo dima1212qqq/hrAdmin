@@ -16,7 +16,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.dovakun.views.GuestLayout;
-import ru.dovakun.data.entity.Role;
+import ru.dovakun.data.enums.Role;
 import ru.dovakun.data.entity.User;
 import ru.dovakun.repo.UserRepository;
 import ru.dovakun.security.AuthenticatedUser;

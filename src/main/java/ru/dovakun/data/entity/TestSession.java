@@ -15,7 +15,7 @@ public class TestSession extends AbstractEntity {
     private String hashCode;
     private int currentQuestionIndex;
     private boolean isCompleted;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Question> questions;
     @ManyToOne()
     private TestAssignment testAssignment;

@@ -50,7 +50,7 @@ public class QuestionComponent extends VerticalLayout {
               });
           }
         });
-        accordionPanel.setOpened(true);
+
     }
 
 
