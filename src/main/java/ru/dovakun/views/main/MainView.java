@@ -25,12 +25,13 @@ import ru.dovakun.security.AuthenticatedUser;
 import ru.dovakun.services.AnswerService;
 import ru.dovakun.services.QuestionService;
 import ru.dovakun.services.TestAssignmentService;
+import ru.dovakun.views.MainLayout;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 @PageTitle("Главная")
-@Route("")
+@Route(value = "",layout = MainLayout.class)
 @Menu(order = 0, icon = LineAwesomeIconUrl.FILE)
 @RolesAllowed("ADMIN")
 public class MainView extends VerticalLayout {
@@ -47,6 +48,7 @@ public class MainView extends VerticalLayout {
         setJustifyContentMode(JustifyContentMode.START);
         User user = authenticatedUser.get().get();
         layout = new VerticalLayout();
+
         Button createTestAssignment = new Button("Создать тестовое", event -> {
             openDialogCreateTestAssignment(user);
         });

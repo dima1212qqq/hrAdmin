@@ -5,7 +5,10 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.BeforeEvent;
@@ -42,6 +45,11 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
     private final TestSessionService testSessionService;
     private Optional<TestAssignment> testAssignment;
     private final TestAssignmentRepo testAssignmentRepo;
+    private TextField nameSearchField;
+    private ComboBox<String> finalTestSearchComboBox;
+    private TextField scoreSearchField;
+    private ComboBox<Status> statusSearchComboBox;
+    Map<Long, TestSession> sessionMap;
 
     public ApplicantsView(TestResultService testResultService, AuthenticatedUser authenticatedUser, ApplicantService applicantService, TestAssignmentService testAssignmentService, TestSessionService testSessionService, TestAssignmentRepo testAssignmentRepo) {
         this.testAssignmentRepo = testAssignmentRepo;
@@ -119,17 +127,34 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
         testAssignment = testAssignmentRepo.findById(Long.valueOf(s));
         if (testAssignment.isPresent() && testAssignment.get().getUser().getId().equals(authenticatedUser.get().get().getId())) {
             Grid<Applicant> grid = new Grid<>(Applicant.class, false);
+            List<Applicant> applicants = applicantService.findAllByTest(testAssignment.get());
+            ListDataProvider<Applicant> dataProvider = new ListDataProvider<>(applicants);
+            grid.setDataProvider(dataProvider);
+            List<TestSession> testSessions = testSessionService.findAllByApplicants(applicants);
+            HorizontalLayout filterLayout = new HorizontalLayout();
+            nameSearchField = new TextField();
+            nameSearchField.setPlaceholder("Поиск по имени");
+            finalTestSearchComboBox = new ComboBox<>();
+            finalTestSearchComboBox.setPlaceholder("Завершил/не завершил");
+            finalTestSearchComboBox.setItems(List.of("Завершил","Не завершил"));
+            scoreSearchField = new TextField();
+            scoreSearchField.setPlaceholder("> баллов чем");
+            statusSearchComboBox = new ComboBox<>();
+            statusSearchComboBox.setPlaceholder("Поиск по статусу");
+            statusSearchComboBox.setItems(Status.values());
+            statusSearchComboBox.setItemLabelGenerator(Status::getTranslationKey);
+            filterLayout.add(nameSearchField,finalTestSearchComboBox,scoreSearchField,statusSearchComboBox);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
             grid.addItemClickListener(event -> {
                 UI.getCurrent().navigate("applicant/" + event.getItem().getId());
             });
+            nameSearchField.addValueChangeListener(event -> applyFilters(dataProvider));
+            finalTestSearchComboBox.addValueChangeListener(event -> applyFilters(dataProvider));
+            scoreSearchField.addValueChangeListener(event -> applyFilters(dataProvider));
+            statusSearchComboBox.addValueChangeListener(event -> applyFilters(dataProvider));
             setFlexGrow(0, grid);
-            List<TestAssignment> testAssignments = testAssignmentService.getTestAssignmentsByUser(authenticatedUser.get().get().getId());
-//        List<Applicant> applicants = applicantService.findAllByTest(testAssignments);
-            List<Applicant> applicants = applicantService.findAllByTest(testAssignment.get());
-//        List<TestResult> testResults = testResultService.findAllByApplicants(applicants);
-            List<TestSession> testSessions = testSessionService.findAllByApplicants(applicants);
-            Map<Long, TestSession> sessionMap = testSessions.stream()
+
+            sessionMap = testSessions.stream()
                     .collect(Collectors.toMap(ts -> ts.getApplicant().getId(), ts -> ts));
 
             grid.addColumn(createApplicantRenderer())
@@ -180,11 +205,47 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
                 });
                 return statusComboBox;
             }).setHeader("Статус");
-            grid.setItems(applicants);
-            add(grid);
+            add(filterLayout,grid);
         }else {
             add(new Div(new H1("Данных о результате тестирования не доступны!")));
         }
 
+    }
+    private void applyFilters(ListDataProvider<Applicant> dataProvider) {
+        dataProvider.setFilter(applicant -> {
+            String nameFilter = nameSearchField.getValue();
+            if (nameFilter != null && !nameFilter.isEmpty() &&
+                    !applicant.getName().toLowerCase().contains(nameFilter.toLowerCase())) {
+                return false;
+            }
+
+            String finalTestFilter = finalTestSearchComboBox.getValue();
+            if (finalTestFilter != null) {
+                boolean isCompleted = "Завершил".equals(finalTestFilter);
+                TestSession session = sessionMap.get(applicant.getId());
+                if (session == null || session.isCompleted() != isCompleted) {
+                    return false;
+                }
+            }
+
+            String scoreFilter = scoreSearchField.getValue();
+            if (scoreFilter != null && !scoreFilter.isEmpty()) {
+                try {
+                    int minScore = Integer.parseInt(scoreFilter);
+                    TestSession session = sessionMap.get(applicant.getId());
+                    if (session == null || testResultService.calcScore(session.getId()) < minScore) {
+                        return false;
+                    }
+                } catch (NumberFormatException e) {
+                }
+            }
+
+            Status statusFilter = statusSearchComboBox.getValue();
+            if (statusFilter != null && !statusFilter.equals(applicant.getStatus())) {
+                return false;
+            }
+
+            return true;
+        });
     }
 }
