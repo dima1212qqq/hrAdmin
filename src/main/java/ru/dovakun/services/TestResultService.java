@@ -8,6 +8,7 @@ import ru.dovakun.data.entity.User;
 import ru.dovakun.repo.TestResultRepo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +30,11 @@ public class TestResultService {
     }
 
     public Long calcScore(Long id) {
-        return testResultRepo.findAllCalcScore(id);
+        Optional<Long> score = Optional.ofNullable(testResultRepo.findAllCalcScore(id));
+        if (score.isPresent()) {
+            return score.get();
+        }else{
+            return 0L;
+        }
     }
 }
