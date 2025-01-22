@@ -26,5 +26,7 @@ public class TestResult extends AbstractEntity {
 
     private String additionalDetails;
 
-    private OffsetDateTime answeredAt;
+    private Long answeredAt;
+
+    private OffsetDateTime answeredAtTime;
 }

@@ -18,13 +18,12 @@ import ru.dovakun.services.TestAssignmentService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 @Route("tests")
 @PageTitle("Список заданий")
 @RolesAllowed("ADMIN")
-@Menu(order = 1, icon = LineAwesomeIconUrl.PEOPLE_CARRY_SOLID)
+@Menu(order = 1, icon = LineAwesomeIconUrl.QUESTION_CIRCLE)
 public class TestAssigmentView extends VerticalLayout {
     List<TestAssignment> testAssignments;
     Grid<TestAssignment> grid = new Grid<>(TestAssignment.class, false);
@@ -35,7 +34,7 @@ public class TestAssigmentView extends VerticalLayout {
         grid.addColumn(TestAssignment::getTitle).setHeader("Название вакансии");
         grid.addColumn(TestAssignment::getVacancyLink).setHeader("Ссылка на вакансию");
         grid.addItemClickListener(event -> {
-            UI.getCurrent().navigate("applicant/" + event.getItem().getId());
+            UI.getCurrent().navigate("applicants/" + event.getItem().getId());
         });
         TextField searchField = new TextField();
         searchField.setWidth("50%");

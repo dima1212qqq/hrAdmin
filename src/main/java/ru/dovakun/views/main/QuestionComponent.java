@@ -4,9 +4,11 @@ import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import org.springframework.dao.DataIntegrityViolationException;
 import ru.dovakun.data.entity.Answer;
 import ru.dovakun.data.entity.Question;
 import ru.dovakun.services.AnswerService;
@@ -36,13 +38,18 @@ public class QuestionComponent extends VerticalLayout {
                 addAnswer.addClickListener(event -> addNewAnswer(answers, question, answerService));
                 deleteQuestion.addThemeVariants(ButtonVariant.LUMO_ERROR);
                 deleteQuestion.addClickListener(event -> {
-                    questionService.delete(question);
-                    answers.removeAll(question.getAnswers());
-                    questions.remove(question);
-                    if (this.getParent().isPresent() && this.getParent().get() instanceof VerticalLayout parentLayout) {
-                        parentLayout.remove(this);
+                    try {
+                        questionService.delete(question);
+                        answers.removeAll(question.getAnswers());
+                        questions.remove(question);
+                        if (this.getParent().isPresent() && this.getParent().get() instanceof VerticalLayout parentLayout) {
+                            parentLayout.remove(this);
+                        }
+                        accordionPanel.removeFromParent();
+                    }catch (DataIntegrityViolationException dataIntegrityViolationException){
+                        Notification.show("Данный вопрос принимал участие в тестирование");
                     }
-                    accordionPanel.removeFromParent();
+
                 });
                 buttonLayout.add(addAnswer, deleteQuestion);
                 accordionPanel.add(questionField, buttonLayout, answersLayout);
