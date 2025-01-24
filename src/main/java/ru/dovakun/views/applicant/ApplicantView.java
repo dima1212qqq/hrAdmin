@@ -1,5 +1,7 @@
 package ru.dovakun.views.applicant;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
@@ -9,13 +11,10 @@ import jakarta.annotation.security.RolesAllowed;
 import ru.dovakun.data.entity.Applicant;
 import ru.dovakun.data.entity.Question;
 import ru.dovakun.data.entity.TestResult;
-import ru.dovakun.data.entity.TestSession;
 import ru.dovakun.repo.ApplicantRepo;
 import ru.dovakun.repo.QuestionRepo;
 import ru.dovakun.repo.TestResultRepo;
-import ru.dovakun.views.testing.TestingView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Route("applicant")
@@ -34,6 +33,9 @@ public class ApplicantView extends VerticalLayout implements HasUrlParameter<Lon
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long aLong) {
         Applicant applicant = applicantRepo.findById(aLong).orElse(null);
+        Button backButton = new Button("Назад", event -> {
+            UI.getCurrent().navigate("applicants/"+applicant.getTestAssignment().getId());
+        });
         Grid<TestResult> grid = new Grid<>(TestResult.class, false);
         List<TestResult> testResults = testResultRepo.findAllByApplicantId(applicant.getId());
         grid.setItems(testResults);
@@ -51,6 +53,6 @@ public class ApplicantView extends VerticalLayout implements HasUrlParameter<Lon
             }
         }).setHeader("Время ответа");
         grid.addColumn(TestResult::getScore).setHeader("Баллы");
-        add(grid);
+        add(backButton,grid);
     }
 }

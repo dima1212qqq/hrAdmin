@@ -1,6 +1,7 @@
 package ru.dovakun.views.applicant;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
@@ -13,6 +14,7 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import ru.dovakun.data.entity.Applicant;
@@ -35,6 +37,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Route("/applicants")
+@PageTitle("Список соискателей")
 @RolesAllowed("ADMIN")
 public class ApplicantsView extends VerticalLayout implements HasUrlParameter<String> {
 
@@ -126,6 +129,9 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
     public void setParameter(BeforeEvent beforeEvent, String s) {
         testAssignment = testAssignmentRepo.findById(Long.valueOf(s));
         if (testAssignment.isPresent() && testAssignment.get().getUser().getId().equals(authenticatedUser.get().get().getId())) {
+            Button backButton = new Button("Назад", event -> {
+                UI.getCurrent().navigate("tests");
+            });
             Grid<Applicant> grid = new Grid<>(Applicant.class, false);
             List<Applicant> applicants = applicantService.findAllByTest(testAssignment.get());
             ListDataProvider<Applicant> dataProvider = new ListDataProvider<>(applicants);
@@ -205,7 +211,7 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
                 });
                 return statusComboBox;
             }).setHeader("Статус");
-            add(filterLayout,grid);
+            add(backButton,filterLayout,grid);
         }else {
             add(new Div(new H1("Данных о результате тестирования не доступны!")));
         }

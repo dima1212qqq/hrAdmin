@@ -46,8 +46,13 @@ public class TestAssignmentForm extends VerticalLayout {
         accordion.setWidthFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
-        HorizontalLayout hLayout = new HorizontalLayout();
-        Anchor link = new Anchor("https://dovakun.net/", "https://dovakun.net/");
+        FlexLayout  hLayout = new FlexLayout ();
+        hLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
+        hLayout.setJustifyContentMode(FlexLayout.JustifyContentMode.START);
+        hLayout.getStyle().set("padding", "5px");
+        hLayout.getStyle().set("gap","10px");
+        hLayout.setAlignItems(Alignment.CENTER);
+        Anchor link = new Anchor("testing/", "testing/");
         uniqueLink.setPrefixComponent(link);
         descriptionField.setMaxLength(255);
         descriptionField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -64,7 +69,6 @@ public class TestAssignmentForm extends VerticalLayout {
             }
             addNewQuestion();
         });
-
         hLayout.add(titleField, linkField, uniqueLink);
         FlexLayout buttonsLayout = new FlexLayout();
         Button cansel = new Button("Вернутся назад");
