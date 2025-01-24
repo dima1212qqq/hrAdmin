@@ -6,6 +6,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -137,7 +138,10 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
             ListDataProvider<Applicant> dataProvider = new ListDataProvider<>(applicants);
             grid.setDataProvider(dataProvider);
             List<TestSession> testSessions = testSessionService.findAllByApplicants(applicants);
-            HorizontalLayout filterLayout = new HorizontalLayout();
+            FlexLayout filterLayout = new FlexLayout();
+            filterLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
+            filterLayout.setFlexDirection(FlexLayout.FlexDirection.ROW);
+            filterLayout.getStyle().set("gap", "10px");
             nameSearchField = new TextField();
             nameSearchField.setPlaceholder("Поиск по имени");
             finalTestSearchComboBox = new ComboBox<>();
@@ -165,16 +169,16 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
 
             grid.addColumn(createApplicantRenderer())
                     .setHeader("Имя и Ссылка")
-                    .setAutoWidth(true)
+                    .setResizable(true)
                     .setFlexGrow(1);
             grid.addColumn(createProgressAndScoreRenderer(sessionMap,testResultService))
                     .setHeader("Прогресс и Баллы")
-                    .setAutoWidth(true)
+                    .setResizable(true)
                     .setFlexGrow(1);
 
             grid.addColumn(createTimeRenderer(formatter))
                     .setHeader("Время")
-                    .setAutoWidth(true)
+                    .setResizable(true)
                     .setFlexGrow(1);
 
             grid.addColumn(applicant -> {
@@ -194,7 +198,7 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
                 } else {
                     return "Ещё не закончил";
                 }
-            }).setHeader("Затраченное время");
+            }).setHeader("Затраченное время").setResizable(true);
             grid.addComponentColumn(applicant -> {
                 ComboBox<Status> statusComboBox = new ComboBox<>();
                 statusComboBox.setItems(Status.values());
@@ -210,7 +214,7 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
                     }
                 });
                 return statusComboBox;
-            }).setHeader("Статус");
+            }).setHeader("Статус").setResizable(true);
             add(backButton,filterLayout,grid);
         }else {
             add(new Div(new H1("Данных о результате тестирования не доступны!")));

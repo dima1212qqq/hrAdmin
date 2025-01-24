@@ -31,8 +31,8 @@ public class TestAssigmentView extends VerticalLayout {
     public TestAssigmentView(TestAssignmentService testAssignmentService, AuthenticatedUser authenticatedUser) {
         testAssignments = testAssignmentService.getTestAssignmentsByUser(authenticatedUser.get().get().getId());
         grid.setItems(testAssignments);
-        grid.addColumn(TestAssignment::getTitle).setHeader("Название вакансии");
-        grid.addColumn(TestAssignment::getVacancyLink).setHeader("Ссылка на вакансию");
+        grid.addColumn(TestAssignment::getTitle).setHeader("Название вакансии").setResizable(true);
+        grid.addColumn(TestAssignment::getVacancyLink).setHeader("Ссылка на вакансию").setResizable(true);
         grid.addItemClickListener(event -> {
             UI.getCurrent().navigate("applicants/" + event.getItem().getId());
         });

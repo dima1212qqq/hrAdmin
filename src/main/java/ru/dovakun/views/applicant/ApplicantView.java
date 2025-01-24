@@ -6,6 +6,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import ru.dovakun.data.entity.Applicant;
@@ -42,17 +43,17 @@ public class ApplicantView extends VerticalLayout implements HasUrlParameter<Lon
         grid.addColumn(testResult->{
             Question question = questionRepo.findById(testResult.getQuestion().getId()).orElse(null);
             return question.getQuestionText();
-        }).setHeader("Вопрос");
-        grid.addColumn(TestResult::getSelectedAnswer).setHeader("Ответ");
-        grid.addColumn(TestResult::getAdditionalDetails).setHeader("Подробный ответ");
+        }).setHeader("Вопрос").setResizable(true);
+        grid.addColumn(TestResult::getSelectedAnswer).setHeader("Ответ").setResizable(true);
+        grid.addColumn(TestResult::getAdditionalDetails).setHeader("Подробный ответ").setResizable(true);
         grid.addColumn(testResult -> {
             if (testResult.getAnsweredAt()<60){
                 return "Меньше минуты";
             }else {
                 return testResult.getAnsweredAt()/60;
             }
-        }).setHeader("Время ответа");
-        grid.addColumn(TestResult::getScore).setHeader("Баллы");
+        }).setHeader("Время ответа").setResizable(true);
+        grid.addColumn(TestResult::getScore).setHeader("Баллы").setResizable(true);
         add(backButton,grid);
     }
 }
