@@ -105,7 +105,7 @@ public class TestingView extends VerticalLayout
                     long seconds = duration.toSeconds();
                     result.setAnsweredAt(seconds);
                     result.setAnsweredAtTime(OffsetDateTime.now());
-                    applicant.setEndTime(OffsetDateTime.now());
+
                 }else {
                     Question previousQuestion = questions.get(session.getCurrentQuestionIndex() - 1);
                     TestResult prevTestResult = testResultRepo.findByApplicantAndQuestion(applicant, previousQuestion);
@@ -127,6 +127,11 @@ public class TestingView extends VerticalLayout
             });
             add(title, count, layout, textArea, continueButton);
         } else if (session != null && session.getCurrentQuestionIndex() == questions.size()) {
+            Applicant applicant = session.getApplicant();
+            if (applicant.getEndTime()==null){
+                applicant.setEndTime(OffsetDateTime.now());
+                applicantService.save(applicant);
+            }
             session.setCompleted(true);
             testSessionService.save(session);
             add(new H1("Спасибо, вы завершили тестирование!"));
