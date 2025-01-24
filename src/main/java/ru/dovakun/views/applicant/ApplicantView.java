@@ -19,6 +19,7 @@ import ru.dovakun.repo.TestResultRepo;
 import java.util.List;
 
 @Route("applicant")
+@PageTitle("Ответы соискателя")
 @RolesAllowed("ADMIN")
 public class ApplicantView extends VerticalLayout implements HasUrlParameter<Long> {
     private final ApplicantRepo applicantRepo;
