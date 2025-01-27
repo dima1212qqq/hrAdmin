@@ -21,27 +21,24 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
+        cache: 'maven'
 
     - name: Build with Maven
       run: mvn clean package -Pproduction
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: hr-admin
-        path: target/*.jar
+    - name: Verify JAR file
+      run: ls -l target/hr-admin-*.jar
 
     - name: Deploy to VPS
       uses: appleboy/scp-action@v0.1.3
       with:
         host: ${{ secrets.VPS_IP }}
         username: ${{ secrets.VPS_USER }}
-        timeout: 2m
-        overwrite: true
-        debug: true 
         key: ${{ secrets.VPS_SSH_KEY }}
-        source: "target/*.jar"
+        source: "target/hr-admin-*.jar"
         target: "/opt/hr-admin/"
+        overwrite: true
+        strip_components: 1  # Убирает директорию target при копировании
         
     - name: Restart application
       uses: appleboy/ssh-action@v0.1.10
@@ -51,5 +48,7 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
           sudo systemctl stop hr-admin.service || true
-          sudo cp /opt/hr-admin/*.jar /opt/hr-admin/hr-admin.jar
+          sudo find /opt/hr-admin/ -name "*.jar" -exec mv {} /opt/hr-admin/hr-admin.jar \;
+          sudo chown ubuntu:ubuntu /opt/hr-admin/hr-admin.jar
+          sudo systemctl daemon-reload
           sudo systemctl start hr-admin.service
