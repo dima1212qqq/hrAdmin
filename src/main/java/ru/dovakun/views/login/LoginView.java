@@ -136,9 +136,11 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         emailField.addValueChangeListener(event -> {
             if (userService.findByUsername(emailField.getValue()).isEmpty()){
                 restorePassword.setEnabled(false);
+                sendCode.setEnabled(false);
                 emailField.setHelperText("Пользователь с данным Email уже не существует");
             }else {
                 restorePassword.setEnabled(true);
+                sendCode.setEnabled(true);
                 emailField.setHelperText(null);
             }
         });
@@ -184,9 +186,11 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         emailField.addValueChangeListener(event -> {
             if (userService.findByUsername(emailField.getValue()).isPresent()){
                 register.setEnabled(false);
+                sendCode.setEnabled(false);
                 emailField.setHelperText("Пользователь с данным Email уже существует");
             }else {
                 register.setEnabled(true);
+                sendCode.setEnabled(true);
                 emailField.setHelperText(null);
             }
         });

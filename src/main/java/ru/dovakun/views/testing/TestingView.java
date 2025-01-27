@@ -172,6 +172,7 @@ public class TestingView extends VerticalLayout
             session.setCompleted(true);
             testSessionService.save(session);
             add(new H1("Спасибо, вы завершили тестирование!"));
+            add(new H1("Пожалуйста, сообщите о завершении тестирования в переписке по вакансии"));
         } else {
             add(new H1("Теста не существует!"));
         }

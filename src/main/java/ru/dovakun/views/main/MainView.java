@@ -1,11 +1,11 @@
 package ru.dovakun.views.main;
 
-import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -28,7 +28,6 @@ import ru.dovakun.services.TestAssignmentService;
 import ru.dovakun.views.MainLayout;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @PageTitle("Главная")
 @Route(value = "",layout = MainLayout.class)
@@ -41,6 +40,7 @@ public class MainView extends VerticalLayout {
     private final TestAssignmentForm testAssignmentForm;
     public TestAssignment currentTestAssignment;
     private final VerticalLayout layout;
+    private static final int DESCRIPTION_MAX_LENGTH = 255;
 
     public MainView(TestAssignmentService testAssignmentService, AuthenticatedUser authenticatedUser, TestAssignmentRepo testAssignmentRepo, QuestionService questionService, AnswerService answerService) {
         setSizeFull();
@@ -57,8 +57,8 @@ public class MainView extends VerticalLayout {
         testGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         testGrid.addColumn(createToggleDetailsRenderer(testGrid)).setWidth("80px")
                 .setFlexGrow(0).setFrozen(true);
-        testGrid.setItemDetailsRenderer(createPersonDetailsRenderer());
-
+        testGrid.setItemDetailsRenderer(createTestAssignmentDetailsRenderer());
+        testGrid.setPageSize(50);
         testGrid.addColumn(TestAssignment::getTitle).setHeader("Название тестового задания");
         testGrid.addColumn(TestAssignment::getVacancyLink).setHeader("Ссылка на вакансию");
         testGrid.setDetailsVisibleOnClick(false);
@@ -96,19 +96,23 @@ public class MainView extends VerticalLayout {
         TextField nameField = new TextField("Название тестового задания");
         TextField linkField = new TextField("Ссылка на вакансию");
         TextArea descriptionField = new TextArea("Описание");
-        descriptionField.setMaxLength(255);
+        descriptionField.setMaxLength(DESCRIPTION_MAX_LENGTH);
         descriptionField.setValueChangeMode(ValueChangeMode.EAGER);
         descriptionField.addValueChangeListener(e -> {
             e.getSource()
                     .setHelperText(e.getValue().length() + "/" + "255");
         });
         Button save = new Button("Сохранить", event -> {
+            if (nameField.isEmpty() || linkField.isEmpty()) {
+                Notification.show("Заполните обязательные поля");
+                return;
+            }
             TestAssignment testAssignment = new TestAssignment();
             testAssignment.setTitle(nameField.getValue());
             testAssignment.setVacancyLink(linkField.getValue());
             testAssignment.setDescription(descriptionField.getValue());
             testAssignment.setUser(user);
-            testAssignmentRepo.save(testAssignment);
+            testAssignmentService.save(testAssignment);
             refreshGrid(user);
             dialog.close();
         });
@@ -137,7 +141,7 @@ public class MainView extends VerticalLayout {
                                 !grid.isDetailsVisible(testAssignment)));
     }
 
-    private static ComponentRenderer<TestAssignmentFormLayout, TestAssignment> createPersonDetailsRenderer() {
+    private static ComponentRenderer<TestAssignmentFormLayout, TestAssignment> createTestAssignmentDetailsRenderer() {
         return new ComponentRenderer<>(TestAssignmentFormLayout::new,
                 TestAssignmentFormLayout::setTestAssignment);
     }
@@ -147,10 +151,8 @@ public class MainView extends VerticalLayout {
 
 
         public TestAssignmentFormLayout() {
-            Stream.of(descriptionField).forEach(field -> {
-                field.setReadOnly(true);
-                add(field);
-            });
+            descriptionField.setReadOnly(true);
+            add(descriptionField);
         }
 
         public void setTestAssignment(TestAssignment testAssignment) {
@@ -161,8 +163,8 @@ public class MainView extends VerticalLayout {
     }
 
     public void refreshGrid(User user) {
-        List<TestAssignment> testAssignments = testAssignmentService.getTestAssignmentsByUser(user.getId());
-        testGrid.setItems(testAssignments);
+        testGrid.setItems(testAssignmentService.getTestAssignmentsByUser(user.getId()));
+        testGrid.getDataProvider().refreshAll();
     }
 
 }
