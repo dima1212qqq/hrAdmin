@@ -5,6 +5,7 @@ import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Properties;
@@ -17,7 +18,7 @@ public class MailService {
 
     @Value("${mail.password}")
     private String password;
-
+    @Async
     public void sendEmail(String recipientEmail, String subject, String body) {
         // Настройки SMTP
         Properties props = new Properties();

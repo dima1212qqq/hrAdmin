@@ -92,12 +92,13 @@ public class MainLayout extends AppLayout {
 
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
+            div.add(user.getUsername());
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
-            userName.getSubMenu().addItem("Sign out", e -> {
+            userName.getSubMenu().addItem("Выйти", e -> {
                 authenticatedUser.logout();
             });
 

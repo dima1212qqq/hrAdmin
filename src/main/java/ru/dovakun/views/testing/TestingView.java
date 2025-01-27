@@ -49,8 +49,20 @@ public class TestingView extends VerticalLayout
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, String s) {
-        setJustifyContentMode(JustifyContentMode.AROUND);
+        setWidthFull(); // Форма занимает всю ширину экрана
+        setPadding(true);
+        setSpacing(true);
         setAlignItems(Alignment.CENTER);
+
+        Div formContainer = new Div();
+        formContainer.getStyle()
+                .set("max-width", "800px") // Ограничение ширины формы
+                .set("margin", "0 auto") // Центровка на странице
+                .set("padding", "20px")
+                .set("box-shadow", "0 4px 8px rgba(0, 0, 0, 0.1)")
+                .set("border-radius", "8px")
+                .set("background-color", "#ffffff");
+
         TestSession session = testSessionService.getByHash(s);
         Hibernate.initialize(session);
         List<Question> questions;
@@ -59,26 +71,51 @@ public class TestingView extends VerticalLayout
         } else {
             questions = new ArrayList<>();
         }
+
         if (session != null && session.getCurrentQuestionIndex() < questions.size()) {
             Applicant applicant = session.getApplicant();
             TestResult result = new TestResult();
             TextArea textArea = new TextArea();
+            textArea.setVisible(false);
+            textArea.setWidthFull(); // Полная ширина для текстового поля
+            textArea.getStyle()
+                    .set("min-height", "150px") // Задать минимальную высоту
+                    .set("resize", "vertical"); // Позволить изменение высоты пользователем
+
             Question question = questions.get(session.getCurrentQuestionIndex());
+
             Div title = new Div(question.getQuestionText());
+            title.getStyle()
+                    .set("font-size", "18px")
+                    .set("font-weight", "bold")
+                    .set("margin-bottom", "10px");
+
             String counter = String.format("%d/%d вопросов", session.getCurrentQuestionIndex() + 1, questions.size());
             Div count = new Div(counter);
+            count.getStyle()
+                    .set("font-size", "14px")
+                    .set("color", "#666")
+                    .set("margin-bottom", "20px");
+
             VerticalLayout layout = new VerticalLayout();
-            layout.setAlignItems(Alignment.CENTER);
+            layout.setWidthFull();
+            layout.setAlignItems(Alignment.STRETCH);
+
             List<AnswerDTO> answers = getAnswersByQuestionId(question.getId());
             RadioButtonGroup<AnswerDTO> answerRadioButtonGroup = new RadioButtonGroup<>();
-            layout.add(answerRadioButtonGroup);
+            answerRadioButtonGroup.setWidthFull();
             answerRadioButtonGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
 
-            Button continueButton = new Button("Продолжить");
+            layout.add(answerRadioButtonGroup);
             answerRadioButtonGroup.setItems(answers);
             answerRadioButtonGroup.setItemLabelGenerator(AnswerDTO::getTitle);
-            textArea.setVisible(false);
-            textArea.setWidth(answerRadioButtonGroup.getWidth());
+
+            Button continueButton = new Button("Продолжить");
+            continueButton.getStyle()
+                    .set("margin-top", "20px")
+                    .set("align-self", "flex-end");
+            continueButton.setEnabled(false);
+
             answerRadioButtonGroup.addValueChangeListener(event -> {
                 continueButton.setEnabled(true);
                 result.setSelectedAnswer(event.getValue().getTitle());
@@ -86,12 +123,11 @@ public class TestingView extends VerticalLayout
                 if (event.getValue().isRequires()) {
                     textArea.setVisible(true);
                     textArea.setLabel(event.getValue().getDetailsHint());
-                    add(textArea);
                 } else {
                     textArea.setVisible(false);
                 }
             });
-            continueButton.setEnabled(false);
+
             continueButton.addClickListener(event -> {
                 if (session.getCurrentQuestionIndex() == 0) {
                     Duration duration = Duration.between(applicant.getStartTime(), OffsetDateTime.now());
@@ -125,7 +161,8 @@ public class TestingView extends VerticalLayout
                 testResultService.save(result);
                 refreshView(beforeEvent, s);
             });
-            add(title, count, layout, textArea, continueButton);
+            formContainer.add(title, count, layout, textArea, continueButton);
+            add(formContainer);
         } else if (session != null && session.getCurrentQuestionIndex() == questions.size()) {
             Applicant applicant = session.getApplicant();
             if (applicant.getEndTime()==null){

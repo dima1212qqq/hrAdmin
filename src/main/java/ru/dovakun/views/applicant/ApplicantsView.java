@@ -215,6 +215,8 @@ public class ApplicantsView extends VerticalLayout implements HasUrlParameter<St
                 });
                 return statusComboBox;
             }).setHeader("Статус").setResizable(true);
+//            setAlignItems(Alignment.STRETCH);
+            expand(grid);
             add(backButton,filterLayout,grid);
         }else {
             add(new Div(new H1("Данных о результате тестирования не доступны!")));

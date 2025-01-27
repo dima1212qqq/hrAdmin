@@ -31,28 +31,37 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @AnonymousAllowed
-@Route(value = "/testing",layout = GuestLayout.class)
-public class RegisterOnTestingView extends VerticalLayout
-        implements HasUrlParameter<String> {
+@Route(value = "/testing", layout = GuestLayout.class)
+public class RegisterOnTestingView extends VerticalLayout implements HasUrlParameter<String> {
     private final TestAssignmentService testAssignmentService;
     private final QuestionService questionService;
     private final ApplicantService applicantService;
     private final TestSessionService testSessionService;
-    private TextField name = new TextField("Ваше имя");
-    private TextField linkHHRU = new TextField("Ссылка на ваше резюме");
-    private TextField feedback  = new TextField("Способ связи, например телефон / email / telegram");
-    private Button startButton = new Button("Начать тестирование");
 
+    private final TextField name = new TextField("Ваше имя");
+    private final TextField linkHHRU = new TextField("Ссылка на ваше резюме");
+    private final TextField feedback = new TextField("Способ связи, например телефон / email / telegram");
+    private final Button startButton = new Button("Начать тестирование");
 
-    public RegisterOnTestingView(TestAssignmentService testAssignmentService, QuestionService questionService, ApplicantService applicantService, TestSessionService testSessionService) {
+    public RegisterOnTestingView(TestAssignmentService testAssignmentService, QuestionService questionService,
+                                 ApplicantService applicantService, TestSessionService testSessionService) {
         this.testAssignmentService = testAssignmentService;
-        name.setRequired(true);
-        linkHHRU.setRequired(true);
-        feedback.setRequired(true);
-        setAlignItems(Alignment.CENTER);
         this.questionService = questionService;
         this.applicantService = applicantService;
         this.testSessionService = testSessionService;
+
+        // Установка обязательности полей
+        name.setRequired(true);
+        linkHHRU.setRequired(true);
+        feedback.setRequired(true);
+
+        setAlignItems(Alignment.CENTER);
+
+        // Динамическая активация кнопки
+        startButton.setEnabled(false);
+        name.addValueChangeListener(e -> toggleStartButton());
+        linkHHRU.addValueChangeListener(e -> toggleStartButton());
+        feedback.addValueChangeListener(e -> toggleStartButton());
     }
 
     @Override
@@ -60,31 +69,83 @@ public class RegisterOnTestingView extends VerticalLayout
         TestAssignment assignment = testAssignmentService.getByLink(s);
         if (assignment == null) {
             H1 error = new H1("Тестовое задание не найдено.");
-            error.getStyle().set("color", "red");
-            error.getStyle().set("text-align", "center");
-            error.getStyle().set("font-size", "large");
+            error.getStyle()
+                    .set("color", "red")
+                    .set("text-align", "center")
+                    .set("font-size", "large");
             add(new Div(error));
-        }else {
+        } else {
             HashCodeGenerator hashCodeGenerator = new HashCodeGenerator();
+
             H1 title = new H1(assignment.getTitle());
-            title.getStyle().set("color", "black");
-            title.getStyle().set("text-align", "center");
-            title.getStyle().set("font-size", "medium");
-            title.getStyle().set("font-weight", "semi-bold");
+            title.getStyle()
+                    .set("text-align", "center")
+                    .set("font-size", "2em")
+                    .set("margin-bottom", "10px");
+
+            // Описание
             H1 description = new H1(assignment.getDescription());
-            description.getStyle().set("color", "black");
-            description.getStyle().set("text-align", "center");
-            description.getStyle().set("font-size", "medium");
-            description.getStyle().set("font-weight", "semi-bold");
-            Anchor link = new Anchor(assignment.getVacancyLink(),assignment.getVacancyLink());
-            List<Question> questions = questionService.getQuestionsByTest(assignment.getId());
-            String countQuestionString = String.format("В данном тесте %d вопросов",questions.size());
-            Text countQuestion = new Text(countQuestionString);
-            add(title, description, link, countQuestion);
-            add(name,linkHHRU,feedback,startButton);
+            description.getStyle()
+                    .set("text-align", "center")
+                    .set("font-size", "1.2em")
+                    .set("color", "#555")
+                    .set("margin-bottom", "20px");
+
+            // Ссылка на вакансию
+            Anchor link = new Anchor(assignment.getVacancyLink(), "Ссылка на вакансию");
+            link.getStyle()
+                    .set("text-decoration", "none")
+                    .set("color", "#007BFF")
+                    .set("font-size", "1em")
+                    .set("margin-bottom", "20px");
+
+            // Количество вопросов
+            Text countQuestion = new Text(
+                    String.format("В данном тесте %d вопросов", questionService.getQuestionsByTest(assignment.getId()).size())
+            );
+            Div countQuestionDiv = new Div(countQuestion);
+            countQuestionDiv.getStyle()
+                    .set("text-align", "center")
+                    .set("font-size", "1em")
+                    .set("margin-bottom", "20px");
+
+            // Настройка полей ввода
+            name.setPlaceholder("Введите ваше имя");
+            name.getStyle().set("width", "300px");
+            linkHHRU.setPlaceholder("Введите ссылку на ваше резюме");
+            linkHHRU.getStyle().set("width", "300px");
+            feedback.setPlaceholder("Введите способ связи, например телефон, email или Telegram");
+            feedback.getStyle().set("width", "300px");
+
+            // Кнопка начала теста
+            startButton.addClassName("primary");
+            startButton.getStyle()
+                    .set("background-color", "#007BFF")
+                    .set("color", "white")
+                    .set("padding", "10px 20px")
+                    .set("border-radius", "5px")
+                    .set("font-size", "1em")
+                    .set("cursor", "pointer")
+                    .set("margin-top", "20px");
+
+            // Центровка и отступы
+            setAlignItems(Alignment.CENTER);
+            setJustifyContentMode(JustifyContentMode.CENTER);
+
+            // Добавляем элементы на экран
+            add(title, description, link, countQuestionDiv, name, linkHHRU, feedback, startButton);
+
             String ipAddress = VaadinRequest.getCurrent().getRemoteAddr();
-            startButton.setEnabled(name.getValue() != null || linkHHRU.getValue() != null || feedback.getValue() != null);
             startButton.addClickListener(e -> {
+                if (name.isEmpty() || linkHHRU.isEmpty() || feedback.isEmpty()) {
+                    Notification notification = new Notification("Все поля должны быть заполнены!");
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    notification.setPosition(Notification.Position.MIDDLE);
+                    notification.setDuration(3000);
+                    notification.open();
+                    return;
+                }
+
                 Applicant applicant = new Applicant();
                 applicant.setName(name.getValue());
                 applicant.setResumeLink(linkHHRU.getValue());
@@ -93,24 +154,32 @@ public class RegisterOnTestingView extends VerticalLayout
                 applicant.setIpAddress(ipAddress);
                 applicant.setHashCode(hashCodeGenerator.generateUserHash(applicant.toString()));
                 applicant.setStartTime(OffsetDateTime.now());
-                applicantService.save(applicant);
-                TestSession testSession = new TestSession();
-                testSession.setCurrentQuestionIndex(0);
-                testSession.setQuestions(questions);
-                testSession.setHashCode(applicant.getHashCode());
-                testSession.setTestAssignment(assignment);
-                testSession.setApplicant(applicant);
+
                 try {
+                    applicantService.save(applicant);
+
+                    TestSession testSession = new TestSession();
+                    testSession.setCurrentQuestionIndex(0);
+                    testSession.setQuestions(questionService.getQuestionsByTest(assignment.getId()));
+                    testSession.setHashCode(applicant.getHashCode());
+                    testSession.setTestAssignment(assignment);
+                    testSession.setApplicant(applicant);
+
                     testSessionService.save(testSession);
-                    UI.getCurrent().navigate("test/"+testSession.getHashCode());
-                }catch (DataIntegrityViolationException dive) {
-                    Notification notification = new Notification("Пользователь уже зарегестрирован на этом тестирование!");
+                    UI.getCurrent().navigate("test/" + testSession.getHashCode());
+                } catch (DataIntegrityViolationException dive) {
+                    Notification notification = new Notification("Пользователь уже зарегистрирован на этом тестировании!");
                     notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                    notification.setPosition(Notification.Position.BOTTOM_CENTER);
-                    notification.open();
+                    notification.setPosition(Notification.Position.MIDDLE);
                     notification.setDuration(3000);
+                    notification.open();
                 }
             });
         }
+    }
+
+
+    private void toggleStartButton() {
+        startButton.setEnabled(!name.isEmpty() && !linkHHRU.isEmpty() && !feedback.isEmpty());
     }
 }

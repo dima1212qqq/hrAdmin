@@ -11,3 +11,9 @@
 .status-adopted {
     background-color: #238c17;
 }
+
+ .wrap-text {
+     white-space: normal;
+     word-wrap: break-word;
+     overflow-wrap: break-word;
+ }
