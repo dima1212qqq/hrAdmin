@@ -10,7 +10,11 @@ jobs:
     permissions:
       contents: read
       packages: write
-
+    env:
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
