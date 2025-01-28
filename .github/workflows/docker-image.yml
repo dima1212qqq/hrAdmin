@@ -1,0 +1,40 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Проверка репозитория и переключение на соответствующую ветку
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Логика сборки и пуша Docker-образа
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract branch name
+      id: vars
+      run: echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+    - name: Build and tag Docker image
+      run: |
+        IMAGE_NAME=ghcr.io/${{ github.repository }}:${{ env.BRANCH_NAME }}
+        echo "Building image $IMAGE_NAME"
+        docker build -t $IMAGE_NAME .
+
+    - name: Push Docker image
+      run: |
+        IMAGE_NAME=ghcr.io/${{ github.repository }}:${{ env.BRANCH_NAME }}
+        echo "Pushing image $IMAGE_NAME"
+        docker push $IMAGE_NAME
