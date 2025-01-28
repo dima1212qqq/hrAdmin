@@ -2,14 +2,14 @@ version: '3.9'
 
 services:
   app:
-    build: .
+    image: ghcr.io/dima1212qqq/hradmin:latest_main
     container_name: vaadin-app
     ports:
-      - "8080:8088"
+      - "8088:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hr-admin
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: daster
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:
@@ -17,24 +17,25 @@ services:
 
   db:
     image: postgres:16
+    container_name: hr-admin
+    environment:
+      POSTGRES_DB: hr-admin
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
-    container_name: hr-admin
-    environment:
-      POSTGRES_DB: hr-admin
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: daster
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
+
 networks:
   default:
-    name: my-network
+    name: hr-admin-network
     driver: bridge
