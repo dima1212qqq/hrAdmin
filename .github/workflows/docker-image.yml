@@ -12,9 +12,9 @@ jobs:
       packages: write
     env:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      SPRING_DATASOURCE_PASSWORD: ${{secrets.DB_PASSWORD }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,3 +46,13 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/hradmin:latest${{ env.SUFFIX }}
           push: true
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Run Docker Compose
+        run: |
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
+          docker-compose up --build -d
