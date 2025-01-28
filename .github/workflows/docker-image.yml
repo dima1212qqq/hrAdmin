@@ -40,5 +40,5 @@ jobs:
           context: .
           file: Dockerfile
           tags: |
-            ghcr.io/${{ github.repository_owner }}/<repo>:latest${{ env.SUFFIX }}
+            ghcr.io/${{ github.repository_owner }}/hradmin:latest${{ env.SUFFIX }}
           push: true
