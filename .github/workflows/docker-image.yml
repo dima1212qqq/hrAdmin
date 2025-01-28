@@ -12,7 +12,7 @@ jobs:
       packages: write
     env:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      SPRING_DATASOURCE_PASSWORD: ${{ DB_PASSWORD }}
+      SPRING_DATASOURCE_PASSWORD: ${{secrets.DB_PASSWORD }}
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
     
     steps:
