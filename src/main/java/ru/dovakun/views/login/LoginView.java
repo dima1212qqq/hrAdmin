@@ -47,7 +47,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         LoginI18n i18n = getLoginI18n();
         LoginOverlay login = new LoginOverlay();
         login.setI18n(i18n);
-        Button register = new Button("Регистрация", event -> {
+        Button register = new Button("Register", event -> {
             openDialogForRegister();
         });
         register.setSizeFull();
