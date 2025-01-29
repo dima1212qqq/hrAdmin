@@ -12,7 +12,6 @@ jobs:
       packages: write
     env:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
       PORT: ${{ secrets.PORT }}
 
@@ -52,3 +51,5 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
+      - name: Debug Environment Variables
+        run: env | grep DB_PASSWORD
