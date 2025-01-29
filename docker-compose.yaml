@@ -9,7 +9,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hr-admin
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      DB_PASSWORD: ${DB_PASSWORD}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_USERNAME: dova@dovakuni.ru
       PORT: ${PORT}
