@@ -29,14 +29,20 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: List files before SCP
+        run: |
+          echo "Содержимое директории:"
+          ls -R
       - name: Copy files via SSH
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.VPS_IP }}
+          host: ${{ secrets.SERVER_IP }}
           username: root
-          key: ${{ secrets.VPS_SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.yml"
           target: "/opt/hr-admin/"
+          overwrite: true
+          strip_components: 0
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.10

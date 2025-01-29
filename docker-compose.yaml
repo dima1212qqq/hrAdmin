@@ -2,10 +2,10 @@ version: '3.9'
 
 services:
   app:
-    image: ghcr.io/dima1212qqq/hradmin:latest_main
+    image: ghcr.io/dima1212qqq/hradmin:latest
     container_name: vaadin-app
     ports:
-      - "443:8085"
+      - "80:80"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hr-admin
       SPRING_DATASOURCE_USERNAME: postgres
