@@ -5,13 +5,14 @@ services:
     image: ghcr.io/dima1212qqq/hradmin:latest_main
     container_name: vaadin-app
     ports:
-      - "8088:8080"
+      - "8080:8085"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hr-admin
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
-      MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_DATASOURCE_USERNAME:
+      SPRING_DATASOURCE_PASSWORD:
+      MAIL_PASSWORD:
+      MAIL_USERNAME:
+      PORT:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:
@@ -23,7 +24,7 @@ services:
     environment:
       POSTGRES_DB: hr-admin
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD:
     ports:
       - "5432:5432"
     volumes:
