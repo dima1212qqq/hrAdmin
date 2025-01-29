@@ -6,8 +6,6 @@ services:
     container_name: vaadin-app
     ports:
       - "443:8085"
-    env_file:
-      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hr-admin
       SPRING_DATASOURCE_USERNAME: postgres
