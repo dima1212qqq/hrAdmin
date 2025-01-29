@@ -8,7 +8,7 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
   MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-  PORT: ${{ secrets.APP_PORT }}
+  APP_PORT: ${{ secrets.APP_PORT }}
 
 jobs:
   build-and-deploy:
