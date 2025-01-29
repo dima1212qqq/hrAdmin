@@ -11,9 +11,10 @@ jobs:
       contents: read
       packages: write
     env:
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      PORT: ${{ secrets.PORT }}
 
     steps:
       - name: Checkout repository
