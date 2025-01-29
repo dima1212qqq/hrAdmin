@@ -6,13 +6,16 @@ services:
     container_name: vaadin-app
     ports:
       - "443:8085"
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hr-admin
       SPRING_DATASOURCE_USERNAME: postgres
-      DB_PASSWORD: ${secrets.DB_PASSWORD}
-      MAIL_PASSWORD: ${secrets.MAIL_PASSWORD}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+#      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_USERNAME: dova@dovakuni.ru
-      PORT: ${secrets.PORT}
+      PORT: ${PORT}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:

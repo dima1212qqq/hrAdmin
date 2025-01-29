@@ -56,3 +56,5 @@ jobs:
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "PORT=${{ secrets.PORT }}" >> .env
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+          echo "Содержимое .env:"  # Для отладки
+          cat .env
