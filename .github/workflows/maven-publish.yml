@@ -15,44 +15,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: 'maven'
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
 
-    - name: Build with Maven
-      run: mvn clean package -Pproduction
+      - name: Build with Maven
+        run: mvn clean package -Pproduction
 
-    - name: Verify JAR file
-      run: ls -l target/hr-admin-*.jar
+      - name: Verify JAR file
+        run: ls -l target/hr-admin-*.jar
 
-    - name: Deploy to VPS
-      uses: appleboy/scp-action@v0.1.3
-      with:
-        host: ${{ secrets.VPS_IP }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        port: 22
-        source: "target/hr-admin-*.jar"
-        target: "/opt/hr-admin/"
-        overwrite: true
-        strip_components: 1
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          source: "target/hr-admin-*.jar"
+          target: "/opt/hr-admin/"
+          overwrite: true
+          strip_components: 1
 
-    - name: Restart application
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.VPS_IP }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        port: 22
-        script: |
-          sudo systemctl stop hr-admin.service || true
-          sudo find /opt/hr-admin/ -name "*.jar" -exec mv {} /opt/hr-admin/hr-admin.jar \;
-          sudo chown ubuntu:ubuntu /opt/hr-admin/hr-admin.jar
-          sudo systemctl daemon-reload
-          sudo systemctl start hr-admin.service
+      - name: Restart application
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: APP_PORT:${{ secrets.APP_PORT }}
+          port: 22
+          script: |
+            sudo systemctl stop hr-admin.service || true
+            sudo find /opt/hr-admin/ -name "*.jar" -exec mv {} /opt/hr-admin/hr-admin.jar \;
+            sudo chown ubuntu:ubuntu /opt/hr-admin/hr-admin.jar
+            echo "APP_PORT=$APP_PORT" | sudo tee -a /etc/environment 
+            sudo systemctl daemon-reload
+            sudo systemctl start hr-admin.service
