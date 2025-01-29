@@ -51,8 +51,3 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-
-      - name: Run Docker Compose
-        run: |
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
-          docker-compose up --build -d
