@@ -28,13 +28,13 @@ import java.util.Collections;
 @AnonymousAllowed
 @PageTitle("Авторизация")
 @Route(value = "login", layout = GuestLayout.class)
-public class LoginView extends VerticalLayout implements BeforeEnterObserver {
+public class LoginView extends VerticalLayout {
 
     private final AuthenticatedUser authenticatedUser;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
-    private String confirmationCode; // Генерируйте код динамически для реальных случаев
+    private String confirmationCode;
 
 
 
@@ -87,16 +87,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         i18n.setErrorMessage(error);
         i18n.setAdditionalInformation(null);
         return i18n;
-    }
-
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-//        if(beforeEnterEvent.getLocation()
-//                .getQueryParameters()
-//                .getParameters()
-//                .containsKey("error")) {
-//            login.setError(true);
-//        }
     }
     public void openDialogForgerPassword() {
         Dialog dialog = new Dialog();

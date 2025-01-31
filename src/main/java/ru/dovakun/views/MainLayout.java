@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import ru.dovakun.data.entity.User;
 import ru.dovakun.security.AuthenticatedUser;
+import ru.dovakun.views.error.NotFoundView;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -114,7 +115,7 @@ public class MainLayout extends AppLayout {
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-        if (authenticatedUser.get().isPresent()) {
+        if (authenticatedUser.get().isPresent() && !getContent().getClass().equals(NotFoundView.class)) {
             viewTitle.setText(getCurrentPageTitle());
         }
     }
@@ -122,4 +123,5 @@ public class MainLayout extends AppLayout {
     private String getCurrentPageTitle() {
         return MenuConfiguration.getPageHeader(getContent()).orElse("");
     }
+
 }

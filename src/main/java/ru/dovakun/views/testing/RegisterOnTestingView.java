@@ -50,14 +50,12 @@ public class RegisterOnTestingView extends VerticalLayout implements HasUrlParam
         this.applicantService = applicantService;
         this.testSessionService = testSessionService;
 
-        // Установка обязательности полей
         name.setRequired(true);
         linkHHRU.setRequired(true);
         feedback.setRequired(true);
 
         setAlignItems(Alignment.CENTER);
 
-        // Динамическая активация кнопки
         startButton.setEnabled(false);
         name.addValueChangeListener(e -> toggleStartButton());
         linkHHRU.addValueChangeListener(e -> toggleStartButton());
@@ -83,7 +81,6 @@ public class RegisterOnTestingView extends VerticalLayout implements HasUrlParam
                     .set("font-size", "2em")
                     .set("margin-bottom", "10px");
 
-            // Описание
             H1 description = new H1(assignment.getDescription());
             description.getStyle()
                     .set("text-align", "center")
@@ -91,7 +88,6 @@ public class RegisterOnTestingView extends VerticalLayout implements HasUrlParam
                     .set("color", "#555")
                     .set("margin-bottom", "20px");
 
-            // Ссылка на вакансию
             Anchor link = new Anchor(assignment.getVacancyLink(), "Ссылка на вакансию");
             link.getStyle()
                     .set("text-decoration", "none")
@@ -99,7 +95,6 @@ public class RegisterOnTestingView extends VerticalLayout implements HasUrlParam
                     .set("font-size", "1em")
                     .set("margin-bottom", "20px");
 
-            // Количество вопросов
             Text countQuestion = new Text(
                     String.format("В данном тесте %d вопросов", questionService.getQuestionsByTest(assignment.getId()).size())
             );
@@ -109,7 +104,6 @@ public class RegisterOnTestingView extends VerticalLayout implements HasUrlParam
                     .set("font-size", "1em")
                     .set("margin-bottom", "20px");
 
-            // Настройка полей ввода
             name.setPlaceholder("Введите ваше имя");
             name.getStyle().set("width", "300px");
             linkHHRU.setPlaceholder("Введите ссылку на ваше резюме");
@@ -117,7 +111,6 @@ public class RegisterOnTestingView extends VerticalLayout implements HasUrlParam
             feedback.setPlaceholder("Введите способ связи, например телефон, email или Telegram");
             feedback.getStyle().set("width", "300px");
 
-            // Кнопка начала теста
             startButton.addClassName("primary");
             startButton.getStyle()
                     .set("background-color", "#007BFF")
@@ -128,11 +121,9 @@ public class RegisterOnTestingView extends VerticalLayout implements HasUrlParam
                     .set("cursor", "pointer")
                     .set("margin-top", "20px");
 
-            // Центровка и отступы
             setAlignItems(Alignment.CENTER);
             setJustifyContentMode(JustifyContentMode.CENTER);
 
-            // Добавляем элементы на экран
             add(title, description, link, countQuestionDiv, name, linkHHRU, feedback, startButton);
 
             String ipAddress = VaadinRequest.getCurrent().getRemoteAddr();

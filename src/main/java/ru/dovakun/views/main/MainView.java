@@ -20,7 +20,6 @@ import jakarta.annotation.security.RolesAllowed;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 import ru.dovakun.data.entity.TestAssignment;
 import ru.dovakun.data.entity.User;
-import ru.dovakun.repo.TestAssignmentRepo;
 import ru.dovakun.security.AuthenticatedUser;
 import ru.dovakun.services.AnswerService;
 import ru.dovakun.services.QuestionService;
@@ -35,14 +34,13 @@ import java.util.List;
 @RolesAllowed("ADMIN")
 public class MainView extends VerticalLayout {
     private final TestAssignmentService testAssignmentService;
-    private final TestAssignmentRepo testAssignmentRepo;
     private final Grid<TestAssignment> testGrid;
     private final TestAssignmentForm testAssignmentForm;
     public TestAssignment currentTestAssignment;
     private final VerticalLayout layout;
     private static final int DESCRIPTION_MAX_LENGTH = 255;
 
-    public MainView(TestAssignmentService testAssignmentService, AuthenticatedUser authenticatedUser, TestAssignmentRepo testAssignmentRepo, QuestionService questionService, AnswerService answerService) {
+    public MainView(TestAssignmentService testAssignmentService, AuthenticatedUser authenticatedUser, QuestionService questionService, AnswerService answerService) {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.START);
@@ -80,7 +78,6 @@ public class MainView extends VerticalLayout {
         add(testAssignmentForm);
         testAssignmentForm.setVisible(false);
         this.testAssignmentService = testAssignmentService;
-        this.testAssignmentRepo = testAssignmentRepo;
     }
 
     public void showForm(boolean isShow) {

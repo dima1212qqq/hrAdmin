@@ -1,16 +1,17 @@
-package ru.dovakun.views;
+package ru.dovakun.views.error;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletResponse;
+import ru.dovakun.views.GuestLayout;
+import ru.dovakun.views.MainLayout;
 
 @Tag(Tag.DIV)
-public class RouteNotFoundError extends Component
-        implements HasErrorParameter<NotFoundException> {
+@ParentLayout(GuestLayout.class)
+@PermitAll
+public class CustomNotFoundTarget extends Component implements HasErrorParameter<NotFoundException> {
 
     @Override
     public int setErrorParameter(BeforeEnterEvent event,
@@ -21,3 +22,4 @@ public class RouteNotFoundError extends Component
         return HttpServletResponse.SC_NOT_FOUND;
     }
 }
+
