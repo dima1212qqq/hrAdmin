@@ -6,8 +6,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import ru.dovakun.views.GuestLayout;
 
-@Route("not-found")
+@Route(value = "not-found", layout = GuestLayout.class)
 @PageTitle("Страница не найдена")
 @AnonymousAllowed
 public class NotFoundView extends VerticalLayout {

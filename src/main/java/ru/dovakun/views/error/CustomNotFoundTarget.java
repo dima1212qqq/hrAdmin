@@ -3,6 +3,7 @@ package ru.dovakun.views.error;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.auth.AccessDeniedErrorRouter;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.dovakun.views.GuestLayout;
