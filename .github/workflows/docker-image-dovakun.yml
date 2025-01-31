@@ -48,18 +48,6 @@ jobs:
           overwrite: true
           strip_components: 0
 
-      - name: Install Docker and Docker Compose on VPS (if not installed)
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.VPS_SSH_KEY }} root@${{ secrets.VPS_IP }} << 'EOF'
-            if ! command -v docker &> /dev/null; then
-              apt-get update && apt-get install -y docker.io
-            fi
-            if ! command -v docker-compose &> /dev/null; then
-              curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              chmod +x /usr/local/bin/docker-compose
-            fi
-          EOF
-
       - name: Deploy via SSH with environment variables
         uses: appleboy/ssh-action@v0.1.7
         with:
