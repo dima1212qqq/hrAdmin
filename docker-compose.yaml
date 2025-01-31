@@ -13,7 +13,7 @@ services:
 #      DB_PASSWORD: ${DB_PASSWORD}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_USERNAME: dova@dovakuni.ru
-      PORT: ${PORT}
+      APP_PORT: ${APP_PORT}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:
