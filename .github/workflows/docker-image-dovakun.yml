@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "Содержимое директории:"
           ls -R
-      - name: Copy files via SSH
+      - name: Copy files via SCP
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_IP }}
@@ -48,14 +48,34 @@ jobs:
           overwrite: true
           strip_components: 0
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.10
+      - name: Install Docker and Docker Compose on VPS (if not installed)
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.VPS_SSH_KEY }} root@${{ secrets.VPS_IP }} << 'EOF'
+            if ! command -v docker &> /dev/null; then
+              apt-get update && apt-get install -y docker.io
+            fi
+            if ! command -v docker-compose &> /dev/null; then
+              curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              chmod +x /usr/local/bin/docker-compose
+            fi
+          EOF
+
+      - name: Deploy via SSH with environment variables
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.VPS_IP }}
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
+          env:
+            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+            MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+            APP_PORT: ${{ secrets.APP_PORT }}
           script: |
             cd /opt/hr-admin/
+            # Передаем переменные окружения для docker compose
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
+            APP_PORT=${{ secrets.APP_PORT }} \
             docker compose down
             docker compose pull
             docker compose up -d
