@@ -66,16 +66,12 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
-          env:
-            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-            MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-            APP_PORT: ${{ secrets.APP_PORT }}
           script: |
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            export MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}"
+            export APP_PORT="${{ secrets.APP_PORT }}"
+  
             cd /opt/hr-admin/
-            # Передаем переменные окружения для docker compose
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
-            APP_PORT=${{ secrets.APP_PORT }} \
             docker compose down
             docker compose pull
             docker compose up -d
