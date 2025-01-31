@@ -43,6 +43,7 @@ jobs:
           target: "/opt/hr-admin/"
           overwrite: true
           strip_components: 0
+          tar_exec: bsdtar
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.10
