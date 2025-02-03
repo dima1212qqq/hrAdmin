@@ -3,7 +3,7 @@ services:
     image: ghcr.io/dima1212qqq/hradmin:latest
     container_name: vaadin-app
     ports:
-      - "8080:8080"
+      - "8080:80"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hr-admin
       SPRING_DATASOURCE_USERNAME: postgres
