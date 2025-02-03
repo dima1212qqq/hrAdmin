@@ -16,6 +16,12 @@ import ru.dovakun.views.login.LoginView;
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity {
 
+    private final CustomAuthenticationEntryPoint customEntryPoint;
+
+    public SecurityConfiguration(CustomAuthenticationEntryPoint customEntryPoint) {
+        this.customEntryPoint = customEntryPoint;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -23,13 +29,14 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.authorizeHttpRequests(
                 authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll());
-
+        http.authorizeHttpRequests(auth->auth
+                .requestMatchers(new AntPathRequestMatcher("/not-found")).permitAll());
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(new AntPathRequestMatcher("/line-awesome/**/*.svg")).permitAll());
-
+        http.exceptionHandling()
+                .authenticationEntryPoint(customEntryPoint);
         super.configure(http);
         setLoginView(http, LoginView.class);
     }
