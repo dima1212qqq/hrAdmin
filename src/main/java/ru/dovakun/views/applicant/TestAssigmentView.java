@@ -38,7 +38,7 @@ public class TestAssigmentView extends VerticalLayout {
         });
         TextField searchField = new TextField();
         searchField.setWidth("50%");
-        searchField.setPlaceholder("Search");
+        searchField.setPlaceholder("Поиск");
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(e -> findTest(e.getValue()));
