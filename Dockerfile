@@ -16,13 +16,4 @@ COPY --from=builder /app/target/*.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
-FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/nginx.conf
-
-COPY server.crt /etc/ssl/certs/
-COPY server.key /etc/ssl/private/
-
-EXPOSE 443
-
-CMD ["nginx", "-g", "daemon off;"]
