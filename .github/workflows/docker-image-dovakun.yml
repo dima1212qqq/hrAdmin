@@ -62,5 +62,5 @@ jobs:
             cd /opt/hr-admin/
             docker compose down
             docker rm vaadin-app
-            docker pull 
+            docker pull ghcr.io/dima1212qqq/hradmin:latest 
             docker compose up -d
